@@ -95,13 +95,13 @@ export default function DashboardPage() {
 
                 {/* User Profile */}
                 <div className="flex items-center gap-3 pl-3 border-l border-[#2B2B43]">
-                  <div className="flex flex-col text-right hidden sm:block leading-tight">
-                    <span className="text-xs text-white font-medium">
+                  <div className="flex flex-col text-left hidden sm:block leading-tight">
+                    <div className="text-xs text-white font-medium">
                       {user.name}
-                    </span>
-                    <span className="text-[10px] text-gray-500">
+                    </div>
+                    <div className="text-[10px] text-gray-500">
                       @{user.username}
-                    </span>
+                    </div>
                   </div>
                   <img
                     src={
