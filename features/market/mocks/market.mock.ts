@@ -1,4 +1,4 @@
-import { CandleData } from "../types/market.type";
+import { CandleData, CryptoSymbol } from "../types/market.type";
 
 export const generateMockCandles = (
   numberOfCandles: number = 100
@@ -32,3 +32,11 @@ export const generateMockCandles = (
   }
   return data;
 };
+
+export const MOCK_SYMBOLS: CryptoSymbol[] = [
+  { symbol: "BTCUSDT", name: "Bitcoin", price: 64230.5, change: 2.5 },
+  { symbol: "ETHUSDT", name: "Ethereum", price: 3450.2, change: -1.2 },
+  { symbol: "SOLUSDT", name: "Solana", price: 145.8, change: 5.4 },
+  { symbol: "BNBUSDT", name: "Binance Coin", price: 590.1, change: 0.5 },
+  { symbol: "DOGEUSDT", name: "Dogecoin", price: 0.12, change: -3.1 },
+];

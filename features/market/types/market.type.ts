@@ -6,3 +6,10 @@ export interface CandleData {
   close: number;
   volume?: number;
 }
+
+export interface CryptoSymbol {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+}
