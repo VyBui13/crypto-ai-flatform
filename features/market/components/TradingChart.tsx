@@ -6,6 +6,7 @@ import {
   ColorType,
   IChartApi,
   CandlestickSeries,
+  HistogramSeries,
   ISeriesApi,
   MouseEventParams,
   CrosshairMode,
@@ -23,6 +24,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
 
   const { data: candles, isLoading } = useHistoricalData(symbol);
   const { activeTool } = useAppStore();
@@ -46,8 +48,33 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
         width,
         height,
         crosshair: { mode: CrosshairMode.Normal },
+        timeScale: {
+          borderColor: "#2B2B43",
+          timeVisible: true,
+        },
+        rightPriceScale: {
+          borderColor: "#2B2B43",
+        },
       });
 
+      // --- 1. TẠO VOLUME SERIES TRƯỚC (Để khởi tạo trục 'volume') ---
+      const volumeSeries = chart.addSeries(HistogramSeries, {
+        color: "#26a69a",
+        priceFormat: {
+          type: "volume",
+        },
+        priceScaleId: "volume", // Định nghĩa ID cho trục này
+      });
+
+      // --- 2. CẤU HÌNH TRỤC 'VOLUME' (Sau khi đã có series) ---
+      chart.priceScale("volume").applyOptions({
+        scaleMargins: {
+          top: 0.8, // Volume bị đẩy xuống, chỉ chiếm 20% chiều cao dưới cùng
+          bottom: 0,
+        },
+      });
+
+      // --- 3. TẠO CANDLESTICK SERIES (Nằm lớp trên) ---
       const series = chart.addSeries(CandlestickSeries, {
         upColor: "#26a69a",
         downColor: "#ef5350",
@@ -58,14 +85,26 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
 
       chartRef.current = chart;
       seriesRef.current = series;
+      volumeSeriesRef.current = volumeSeries;
 
-      // Set data nếu đã có sẵn
+      // --- 4. NẠP DỮ LIỆU BAN ĐẦU ---
       if (candles?.length) {
         series.setData(candles as any);
+
+        const volumeData = candles.map((item: any) => ({
+          time: item.time,
+          value: item.volume || Math.random() * 100, // Fallback nếu thiếu volume
+          color:
+            item.close >= item.open
+              ? "rgba(38, 166, 154, 0.3)" // Xanh mờ
+              : "rgba(239, 83, 80, 0.3)", // Đỏ mờ
+        }));
+        volumeSeries.setData(volumeData as any);
+
         chart.timeScale().fitContent();
       }
 
-      // Handle click for markers
+      // --- 5. XỬ LÝ CLICK (TRENDLINE MOCK) ---
       chart.subscribeClick((param: MouseEventParams) => {
         if (!param.time || !series) return;
 
@@ -93,22 +132,23 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
       const { width, height } = entries[0].contentRect;
       const h = height || 500;
 
-      // Nếu có size hợp lệ mà chưa có chart → init
+      // Init chart nếu chưa có
       if (width > 0 && !chart) {
         initChart(width, h);
       }
 
-      // Nếu đã có chart và size hợp lệ → resize
+      // Resize chart nếu đã có
       if (chart && width > 0) {
         chart.applyOptions({ width, height: h });
       }
 
-      // Nếu container về 0 → remove để chờ init lại
+      // Cleanup nếu container bị ẩn
       if (width === 0 && chart) {
         chart.remove();
         chart = null;
         chartRef.current = null;
         seriesRef.current = null;
+        volumeSeriesRef.current = null;
       }
     });
 
@@ -119,18 +159,32 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
       chart?.remove();
       chartRef.current = null;
       seriesRef.current = null;
+      volumeSeriesRef.current = null;
     };
-  }, [candles]);
+  }, [candles]); // Re-init nếu data nến thay đổi hoàn toàn (ví dụ đổi symbol)
 
-  // Update data khi candles thay đổi
+  // --- EFFECT: CẬP NHẬT DATA KHI API TRẢ VỀ ---
   useEffect(() => {
-    if (seriesRef.current && candles?.length) {
+    if (seriesRef.current && volumeSeriesRef.current && candles?.length) {
+      // Update Nến
       seriesRef.current.setData(candles as any);
+
+      // Update Volume
+      const volumeData = candles.map((item: any) => ({
+        time: item.time,
+        value: item.volume || Math.random() * 100,
+        color:
+          item.close >= item.open
+            ? "rgba(38, 166, 154, 0.3)"
+            : "rgba(239, 83, 80, 0.3)",
+      }));
+      volumeSeriesRef.current.setData(volumeData as any);
+
       chartRef.current?.timeScale().fitContent();
     }
   }, [candles]);
 
-  // Update crosshair theo tool
+  // --- EFFECT: ĐỔI CON TRỎ THEO TOOL ---
   useEffect(() => {
     if (!chartRef.current) return;
 
@@ -144,16 +198,19 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
 
   return (
     <div className="w-full h-full bg-[#131722] relative flex flex-col min-h-[400px]">
+      {/* Symbol Label */}
       <div className="absolute top-2 left-2 z-20 text-white font-bold bg-black/50 px-2 rounded pointer-events-none select-none">
         {symbol} - D1
       </div>
 
+      {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#131722] bg-opacity-80">
           <div className="text-white animate-pulse">Loading Chart Data...</div>
         </div>
       )}
 
+      {/* Chart Container */}
       <div
         ref={chartContainerRef}
         className="w-full h-full flex-1 min-h-[400px]"
