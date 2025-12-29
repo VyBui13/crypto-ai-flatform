@@ -15,6 +15,7 @@ import {
 } from "lightweight-charts";
 import { useHistoricalData } from "../services/market.query";
 import { useAppStore } from "@/stores/app.store";
+import { useCryptoSocket } from "../hooks/use-crypto-socket";
 
 interface TradingChartProps {
   symbol: string;
@@ -28,6 +29,31 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
 
   const { data: candles, isLoading } = useHistoricalData(symbol);
   const { activeTool } = useAppStore();
+
+  const lastCandle =
+    candles && candles.length > 0 ? candles[candles.length - 1] : undefined;
+
+  useCryptoSocket({
+    symbol,
+    lastCandle: lastCandle as any,
+    enabled: !!candles && !isLoading, // Chỉ chạy khi đã load xong lịch sử
+    onUpdate: (updatedCandle) => {
+      if (seriesRef.current) {
+        seriesRef.current.update(updatedCandle as any);
+      }
+
+      if (volumeSeriesRef.current) {
+        volumeSeriesRef.current.update({
+          time: updatedCandle.time,
+          value: updatedCandle.volume,
+          color:
+            updatedCandle.close >= updatedCandle.open
+              ? "rgba(38, 166, 154, 0.5)"
+              : "rgba(239, 83, 80, 0.5)",
+        } as any);
+      }
+    },
+  });
 
   useLayoutEffect(() => {
     if (!chartContainerRef.current) return;
