@@ -5,6 +5,7 @@ export const getNews = async (
   params: GetNewsListRequestDto
 ): Promise<GetNewsListResponseDto> => {
   // 1. Destructure và gán giá trị mặc định
+
   const {
     page = 1,
     pageSize = 10,
@@ -15,7 +16,7 @@ export const getNews = async (
   } = params;
 
   // 2. Giả lập delay mạng (0.8s)
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  await new Promise((resolve) => setTimeout(resolve, 4000));
 
   // Clone mảng để không ảnh hưởng dữ liệu gốc
   let result = [...MOCK_NEWS];
