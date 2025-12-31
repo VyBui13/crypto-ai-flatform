@@ -11,6 +11,7 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app.store";
@@ -46,6 +47,12 @@ export const AppSidebar = () => {
           icon={<Newspaper size={18} />}
           isActive={pathname === "/news"}
           title="News Feed"
+        />
+        <NavItem
+          href="/subscription"
+          icon={<CreditCard size={18} />}
+          isActive={pathname === "/subscription"}
+          title="Pricing & Plans"
         />
       </div>
 
