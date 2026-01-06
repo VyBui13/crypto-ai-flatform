@@ -4,8 +4,6 @@ import { GetNewsListRequestDto, GetNewsListResponseDto } from "./news.dto";
 export const getNews = async (
   params: GetNewsListRequestDto
 ): Promise<GetNewsListResponseDto> => {
-  // 1. Destructure và gán giá trị mặc định
-
   const {
     page = 1,
     pageSize = 10,

@@ -1,39 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { PricingCard } from "@/features/subscription/components/PricingCard";
-import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
-import { useAuthStore } from "@/stores/auth.store";
-import { PRICING_PLANS } from "@/features/subscription/constants/subcription.constant";
+import { PricingCardSkeleton } from "@/features/subscription/components/PricingCardSkeleton";
+import { useSubscription } from "@/features/subscription/hooks/use-subcription";
 
 export default function SubscriptionPage() {
-  const { user, upgradeToVip } = useAuthStore();
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-  const router = useRouter();
+  const { user, subscription, isSubscriptionLoading, handlers } =
+    useSubscription();
 
-  const handleSubscribe = async (planId: string) => {
-    if (!user) {
-      router.push("/login"); // Bắt buộc login mới đc mua
-      return;
-    }
-
-    setLoadingId(planId);
-
-    // Giả lập gọi API thanh toán (Delay 1.5s)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    if (planId === "vip") {
-      upgradeToVip(); // Update Store
-      alert("Upgrade Successful! Welcome to VIP.");
-    }
-
-    setLoadingId(null);
-  };
-
-  // Xác định plan hiện tại của user
-  // Nếu chưa login -> Coi như Basic
-  // Nếu đã login -> Check role
   const currentPlanId = user?.role === "vip" ? "vip" : "basic";
 
   return (
@@ -54,15 +29,22 @@ export default function SubscriptionPage() {
 
         {/* Pricing Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
-          {PRICING_PLANS.map((plan) => (
-            <PricingCard
-              key={plan.id}
-              plan={plan}
-              isCurrentPlan={currentPlanId === plan.id}
-              onSubscribe={handleSubscribe}
-              isLoading={loadingId === plan.id}
-            />
-          ))}
+          {isSubscriptionLoading ? (
+            <>
+              <PricingCardSkeleton />
+              <PricingCardSkeleton />
+            </>
+          ) : (
+            subscription?.map((plan) => (
+              <PricingCard
+                key={plan.id}
+                plan={{ ...plan, popular: plan.isPopular }}
+                isCurrentPlan={currentPlanId === plan.id}
+                onSubscribe={handlers.onSubscribe}
+                isLoading={false}
+              />
+            ))
+          )}
         </div>
 
         {/* Trust Badges */}
