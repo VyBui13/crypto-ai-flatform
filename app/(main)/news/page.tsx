@@ -43,20 +43,6 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen bg-[#0E0E14] text-gray-300 font-sans">
-      <header className="sticky top-0 z-50 bg-[#0E0E14]/90 backdrop-blur-md border-b border-[#2B2B43] p-4">
-        <div className=" h-full flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2 hover:bg-[#1E222D] rounded-lg transition-colors text-gray-400 hover:text-white"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <h1 className="text-xl font-bold text-white tracking-tight">
-            CryptoAI News Feed
-          </h1>
-        </div>
-      </header>
-
       <main className="w-full p-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start h-full">
           <aside className="sticky top-0 col-span-1 space-y-6 h-full">
