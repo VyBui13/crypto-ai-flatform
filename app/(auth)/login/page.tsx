@@ -7,9 +7,10 @@ import { Lock, User, Loader2, ArrowRight, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils"; // Hàm tiện ích class merge (nếu có)
 import { LoginSchema, LoginType } from "@/features/auth/schema/auth.schema";
 import { useLoginMutation } from "@/features/auth/services/auth.mutation";
+import { toast } from "sonner";
 
 export default function LoginPage() {
-  const { mutate, isPending, error, isError } = useLoginMutation();
+  const { mutateAsync, isPending, error, isError } = useLoginMutation();
 
   // 1. Setup Form Hook
   const {
@@ -19,14 +20,19 @@ export default function LoginPage() {
   } = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
 
   // 2. Submit Handler (Chỉ chạy khi validation pass)
-  const onSubmit = (data: LoginType) => {
-    mutate(data);
+  const onSubmit = async (data: LoginType) => {
+    try {
+      await mutateAsync(data);
+      toast.success("Login successful!");
+    } catch (err) {
+      console.log("Login error:", err);
+    }
   };
 
   return (
@@ -49,15 +55,15 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Username Field */}
+        {/* email Field */}
         <div className="space-y-1.5">
           <div className="flex justify-between">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Username
+              email
             </label>
-            {errors.username && (
+            {errors.email && (
               <span className="text-xs text-red-400">
-                {errors.username.message}
+                {errors.email.message}
               </span>
             )}
           </div>
@@ -67,11 +73,11 @@ export default function LoginPage() {
               size={18}
             />
             <input
-              {...register("username")}
+              {...register("email")}
               type="text"
               className={cn(
                 "w-full bg-[#131722] border text-white rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-1 transition-all placeholder-gray-700",
-                errors.username
+                errors.email
                   ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
                   : "border-[#2B2B43] focus:border-blue-500 focus:ring-blue-500"
               )}

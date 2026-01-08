@@ -10,9 +10,11 @@ import {
   RegisterType,
 } from "@/features/auth/schema/auth.schema";
 import { useRegisterMutation } from "@/features/auth/services/auth.mutation";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const { mutate, isPending, error, isError } = useRegisterMutation();
+  const { mutateAsync, isPending, error, isError } = useRegisterMutation();
 
   const {
     register,
@@ -21,20 +23,27 @@ export default function RegisterPage() {
   } = useForm<RegisterType>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      username: "",
-      name: "",
+      email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: RegisterType) => {
+  const router = useRouter();
+
+  const onSubmit = async (data: RegisterType) => {
     // Zod đã đảm bảo password khớp nhau rồi, cứ thế gọi API thôi
-    mutate({
-      username: data.username,
-      password: data.password,
-      name: data.name,
-    });
+    try {
+      await mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
+      toast.success("Registration successful! Please log in.");
+      router.push("/login");
+    } catch (err) {
+      // toast.error("Registration failed. Please try again.");
+      console.log("Registration error:", err);
+    }
   };
 
   return (
@@ -56,67 +65,33 @@ export default function RegisterPage() {
             <span>{error?.message}</span>
           </div>
         )}
-
-        <div className="grid grid-cols-2 gap-4">
-          {/* Username */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between">
-              <label className="text-xs font-bold text-gray-500 uppercase">
-                Username
-              </label>
-            </div>
-            <div className="relative group">
-              <User
-                className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
-                size={16}
-              />
-              <input
-                {...register("username")}
-                type="text"
-                className={cn(
-                  "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
-                  errors.username
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-[#2B2B43] focus:border-blue-500"
-                )}
-                placeholder="user123"
-              />
-            </div>
-            {errors.username && (
-              <p className="text-[10px] text-red-400">
-                {errors.username.message}
-              </p>
-            )}
+        {/* email */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between">
+            <label className="text-xs font-bold text-gray-500 uppercase">
+              email
+            </label>
           </div>
-
-          {/* Full Name */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between">
-              <label className="text-xs font-bold text-gray-500 uppercase">
-                Full Name
-              </label>
-            </div>
-            <div className="relative group">
-              <Type
-                className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
-                size={16}
-              />
-              <input
-                {...register("name")}
-                type="text"
-                className={cn(
-                  "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
-                  errors.name
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-[#2B2B43] focus:border-blue-500"
-                )}
-                placeholder="John Doe"
-              />
-            </div>
-            {errors.name && (
-              <p className="text-[10px] text-red-400">{errors.name.message}</p>
-            )}
+          <div className="relative group">
+            <User
+              className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
+              size={16}
+            />
+            <input
+              {...register("email")}
+              type="text"
+              className={cn(
+                "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
+                errors.email
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-[#2B2B43] focus:border-blue-500"
+              )}
+              placeholder="user123"
+            />
           </div>
+          {errors.email && (
+            <p className="text-[10px] text-red-400">{errors.email.message}</p>
+          )}
         </div>
 
         {/* Password */}

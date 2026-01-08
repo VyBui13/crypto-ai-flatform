@@ -6,12 +6,12 @@ import { loginUser, registerUser } from "./auth.api";
 // Hook Login
 export const useLoginMutation = () => {
   const router = useRouter();
-  const setUser = useAuthStore((state) => state.setUser);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
     mutationFn: loginUser, // Gọi hàm API
     onSuccess: (data) => {
-      setUser(data);
+      setAuth(data.accessToken);
       router.push("/");
     },
     onError: (error: Error) => {
@@ -23,14 +23,9 @@ export const useLoginMutation = () => {
 
 // Hook Register
 export const useRegisterMutation = () => {
-  const router = useRouter();
-  const setUser = useAuthStore((state) => state.setUser);
-
   return useMutation({
     mutationFn: registerUser,
-    onSuccess: (data) => {
-      setUser(data);
-      router.push("/");
-    },
+    // onSuccess: () => {
+    // },
   });
 };
