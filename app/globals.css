@@ -123,3 +123,31 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* 1. Cho Webkit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px; /* Chiều rộng cho thanh dọc */
+  height: 8px; /* Chiều cao cho thanh ngang */
+}
+
+/* Màu nền của rãnh (Track) */
+::-webkit-scrollbar-track {
+  background: #0e0e14;
+}
+
+/* Màu của tay cầm (Thumb) */
+::-webkit-scrollbar-thumb {
+  background: #2b2b43; /* Màu xám xanh giống border */
+  border-radius: 4px; /* Bo tròn */
+}
+
+/* Khi di chuột vào tay cầm */
+::-webkit-scrollbar-thumb:hover {
+  background: #3e3e55; /* Sáng hơn chút */
+}
+
+/* 2. Cho Firefox (Dùng thuộc tính riêng) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2b2b43 #0e0e14;
+}
