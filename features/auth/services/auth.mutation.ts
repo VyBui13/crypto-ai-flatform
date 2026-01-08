@@ -12,7 +12,7 @@ export const useLoginMutation = () => {
     mutationFn: loginUser, // Gọi hàm API
     onSuccess: (data) => {
       setAuth(data.accessToken);
-      router.push("/");
+      // router.push("/");
     },
     onError: (error: Error) => {
       console.log("Login failed:", error.message);

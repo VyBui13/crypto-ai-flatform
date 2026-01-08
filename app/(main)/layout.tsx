@@ -1,7 +1,7 @@
 import React from "react";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/common/Header";
-import { ScrollArea } from "@/components/ui/scroll-area"; // Import Shadcn ScrollArea
+import AuthGuard from "@/components/common/AuthGuard";
 
 export default function MainLayout({
   children,
@@ -9,6 +9,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
+    // <AuthGuard>
     <div className="flex h-screen bg-[#0E0E14] text-gray-300 font-sans overflow-hidden">
       <AppSidebar />
 
@@ -23,5 +24,6 @@ export default function MainLayout({
         </div>
       </div>
     </div>
+    // </AuthGuard>
   );
 }

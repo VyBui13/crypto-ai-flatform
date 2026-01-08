@@ -8,6 +8,7 @@ interface AuthState {
   isAuthenticated: boolean;
 
   setAuth: (accessToken: string) => void; // <--- Cập nhật hàm này
+  setUser: (user: User) => void;
   logout: () => void;
   upgradeToVip: () => void;
 }
@@ -20,7 +21,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       setAuth: (accessToken) => set({ accessToken, isAuthenticated: true }),
-
+      setUser: (user) => set({ user }),
       logout: () =>
         set({ user: null, accessToken: null, isAuthenticated: false }),
 

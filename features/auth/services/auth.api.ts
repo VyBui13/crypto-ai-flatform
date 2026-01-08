@@ -48,7 +48,9 @@ export const loginUser = async (
       },
     });
     // Giả sử API trả về user data
-    return response.data.access_token;
+    return {
+      accessToken: response.data.access_token,
+    };
   } catch (error) {
     throw new Error("Tài khoản hoặc mật khẩu không đúng");
   }
@@ -62,5 +64,14 @@ export const registerUser = async (data: RegisterRequestDto): Promise<void> => {
     });
   } catch (error) {
     throw new Error("Đăng ký thất bại. Vui lòng thử lại.");
+  }
+};
+
+export const getUserProfile = async (): Promise<User> => {
+  try {
+    const response = await apiClient.get("/users/me");
+    return response.data;
+  } catch (error) {
+    throw new Error("Không thể lấy thông tin người dùng.");
   }
 };
