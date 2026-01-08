@@ -22,20 +22,15 @@ export const useCryptoSocket = ({
   useEffect(() => {
     if (!symbol) return;
 
-    // 1. Khởi tạo socket service
     const socket = createSocketConnection(symbol);
     socketRef.current = socket;
 
-    // 2. Đăng ký hàm nhận dữ liệu để update UI
     socket.subscribe((newCandle) => {
       onUpdate(newCandle);
     });
 
-    // 3. Bắt đầu kết nối
     socket.connect();
 
-    // 4. Cleanup function: Chạy khi component bị hủy (Unmount)
-    // hoặc khi symbol thay đổi
     return () => {
       socket.disconnect();
     };

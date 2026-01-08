@@ -2,28 +2,37 @@
 
 import Link from "next/link";
 import { TradingChart } from "@/features/market/components/TradingChart";
-import { SymbolSelector } from "@/features/market/components/SymbolSelector";
-import { Crown, LogOut, Lock } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Crown, Lock } from "lucide-react";
 import { useAppStore } from "@/stores/app.store";
 import { useAuthStore } from "@/stores/auth.store";
 import MockBlurItem from "@/components/common/MockBlurItem";
 import AIAnalysisCard from "@/components/common/AIAnalysisCard";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+const INTERVALS = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
 export default function DashboardPage() {
   const { symbol } = useAppStore();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const isVip = user?.role === "vip";
+  const [interval, setInterval] = useState("1m");
 
   return (
     <main className="h-full flex-1 flex flex-col min-w-0 bg-red-500">
       <div className="flex-1 flex overflow-y-auto">
         <div className="flex-1 border-r border-[#2B2B43] relative flex flex-col">
           <div className="h-9 border-b border-[#2B2B43] flex items-center px-2 gap-1 bg-[#131722]">
-            {["15m", "1H", "4H", "1D", "1W"].map((tf) => (
+            {INTERVALS.map((tf) => (
               <button
                 key={tf}
-                className="px-2 py-0.5 text-[11px] font-medium text-gray-400 hover:text-white hover:bg-[#2A2E39] rounded transition-colors"
+                onClick={() => setInterval(tf)}
+                className={cn(
+                  "px-2 py-0.5 text-[11px] font-medium rounded transition-colors min-w-[32px]",
+                  interval === tf
+                    ? "bg-[#2962FF] text-white" // Style khi đang chọn (Active)
+                    : "text-gray-400 hover:text-white hover:bg-[#2A2E39]" // Style mặc định
+                )}
               >
                 {tf}
               </button>
@@ -31,7 +40,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex-1 relative bg-[#131722]">
-            <TradingChart symbol={symbol} />
+            <TradingChart symbol={symbol} interval={interval} />
           </div>
         </div>
 

@@ -19,19 +19,28 @@ import { useCryptoSocket } from "../hooks/use-crypto-socket";
 
 interface TradingChartProps {
   symbol: string;
+  interval: string;
 }
 
-export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
+export const TradingChart: React.FC<TradingChartProps> = ({
+  symbol,
+  interval,
+}) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
 
-  const { data: candles, isLoading } = useHistoricalData(symbol);
+  const {
+    data: candles,
+    isLoading,
+    isFetching,
+  } = useHistoricalData(symbol, interval);
   const { activeTool } = useAppStore();
 
   useCryptoSocket({
     symbol: symbol,
+    interval: interval,
     onUpdate: (realtimeCandle) => {
       if (seriesRef.current) {
         seriesRef.current.update(realtimeCandle);
@@ -214,7 +223,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
       </div>
 
       {/* Loading Overlay */}
-      {isLoading && (
+      {(isLoading || isFetching) && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#131722] bg-opacity-80">
           <div className="text-white animate-pulse">Loading Chart Data...</div>
         </div>
