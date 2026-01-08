@@ -9,9 +9,19 @@ export interface CandleData {
   volume?: number;
 }
 
-export interface CryptoSymbol {
+export interface SymbolInfo {
   symbol: string;
-  name: string;
-  price: number;
-  change: number;
+  baseAsset: string; // BTC
+  quoteAsset: string; // USDT
+  status?: string; // TRADING
+}
+
+export interface TickerInfo {
+  symbol: string;
+  priceChange: number; // Giá thay đổi
+  priceChangePercent: number; // % thay đổi (Quan trọng)
+  lastPrice: number; // Giá hiện tại
+  highPrice: number; // Giá cao nhất 24h
+  lowPrice: number; // Giá thấp nhất 24h
+  volume: number; // Khối lượng giao dịch
 }

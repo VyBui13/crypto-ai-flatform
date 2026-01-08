@@ -218,9 +218,9 @@ export const TradingChart: React.FC<TradingChartProps> = ({
   return (
     <div className="w-full h-full bg-[#131722] relative flex flex-col min-h-[400px]">
       {/* Symbol Label */}
-      <div className="absolute top-2 left-2 z-20 text-white font-bold bg-black/50 px-2 rounded pointer-events-none select-none">
+      {/* <div className="absolute top-2 left-2 z-1 text-white font-bold bg-black/50 px-2 rounded pointer-events-none select-none">
         {symbol} - D1
-      </div>
+      </div> */}
 
       {/* Loading Overlay */}
       {(isLoading || isFetching) && (
