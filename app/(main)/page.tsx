@@ -9,6 +9,8 @@ import MockBlurItem from "@/components/common/MockBlurItem";
 import AIAnalysisCard from "@/components/common/AIAnalysisCard";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { OrderForm } from "@/features/market/components/OrderForm";
+import { OrderBook } from "@/features/market/components/OrderBook";
 
 const INTERVALS = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
@@ -42,6 +44,14 @@ export default function DashboardPage() {
           <div className="flex-1 relative bg-[#131722]">
             <TradingChart symbol={symbol} interval={interval} />
           </div>
+        </div>
+
+        {/* <div className="hidden lg:block h-full">
+          <OrderForm />
+        </div> */}
+
+        <div className="hidden lg:block h-full border-r border-[#2B2B43]">
+          <OrderBook />
         </div>
 
         {/* RIGHT PANEL (NEWS & AI) - XỬ LÝ LOGIC AUTH */}

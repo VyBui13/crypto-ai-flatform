@@ -1,6 +1,12 @@
 import apiClient from "@/lib/api-client";
 import { generateMockCandles } from "../mocks/market.mock";
-import { CandleData, SymbolInfo, TickerInfo } from "../types/market.type";
+import {
+  CandleData,
+  OrderBook,
+  PriceInfo,
+  SymbolInfo,
+  TickerInfo,
+} from "../types/market.type";
 
 // Giả lập API call delay 500ms
 export const fetchHistoricalData = async (
@@ -62,5 +68,37 @@ export const get24hTicker = async (symbol: string): Promise<TickerInfo> => {
     };
   } catch (error) {
     throw new Error("Lấy thông tin ticker thất bại. Vui lòng thử lại.");
+  }
+};
+
+export const getPrice = async (symbol: string): Promise<PriceInfo> => {
+  try {
+    const response = await apiClient.get("/market/price", {
+      params: { symbol: symbol.toUpperCase() },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Lấy thông tin giá thất bại. Vui lòng thử lại.");
+  }
+};
+
+export const getDepth = async (symbol: string): Promise<OrderBook> => {
+  try {
+    const response = await apiClient.get(
+      "/market/depth/" + symbol.toUpperCase(),
+      {
+        params: { limit: 100 },
+      }
+    );
+    return {
+      ...response.data,
+      lastUpdateId: response.data.last_update_id,
+      bids: response.data.bids.map((item: any) => ({
+        price: Number(item.price),
+        quantity: Number(item.quantity),
+      })),
+    };
+  } catch (error) {
+    throw new Error("Lấy thông tin order book thất bại. Vui lòng thử lại.");
   }
 };

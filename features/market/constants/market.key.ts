@@ -3,4 +3,6 @@ export const MARKET_QUERY_KEY = {
   HISTORY: "history",
   SYMBOL: "symbols",
   TICKER_24H: "ticker_24h",
+  PRICE: "price",
+  DEPTH: "depth",
 };

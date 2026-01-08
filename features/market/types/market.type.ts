@@ -25,3 +25,20 @@ export interface TickerInfo {
   lowPrice: number; // Giá thấp nhất 24h
   volume: number; // Khối lượng giao dịch
 }
+
+export interface PriceInfo {
+  symbol: string;
+  price: number;
+}
+
+export interface OrderBookEntry {
+  price: string;
+  quantity: string;
+}
+
+export interface OrderBook {
+  symbol: string;
+  lastUpdateId: number;
+  bids: OrderBookEntry[];
+  asks: OrderBookEntry[];
+}
