@@ -1,5 +1,5 @@
 export type LoginRequestDto = {
-  email: string;
+  username: string;
   password: string;
 };
 
@@ -10,4 +10,6 @@ export type LoginResponseDto = {
 export type RegisterRequestDto = {
   email: string;
   password: string;
+  username: string;
+  fullname: string;
 };

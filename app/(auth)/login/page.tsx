@@ -20,7 +20,7 @@ export default function LoginPage() {
   } = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -55,15 +55,15 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* email Field */}
+        {/* username Field */}
         <div className="space-y-1.5">
           <div className="flex justify-between">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              email
+              username
             </label>
-            {errors.email && (
+            {errors.username && (
               <span className="text-xs text-red-400">
-                {errors.email.message}
+                {errors.username.message}
               </span>
             )}
           </div>
@@ -73,11 +73,11 @@ export default function LoginPage() {
               size={18}
             />
             <input
-              {...register("email")}
+              {...register("username")}
               type="text"
               className={cn(
                 "w-full bg-[#131722] border text-white rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-1 transition-all placeholder-gray-700",
-                errors.email
+                errors.username
                   ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
                   : "border-[#2B2B43] focus:border-blue-500 focus:ring-blue-500"
               )}

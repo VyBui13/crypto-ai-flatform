@@ -22,7 +22,7 @@ export const loginUser = async (
   // console.log(`[API] Attempting login for ${creds.username}...`);
 
   const formData = new URLSearchParams();
-  formData.append("username", data.email); // BE FastAPI yêu cầu field này tên là 'username'
+  formData.append("username", data.username); // BE FastAPI yêu cầu field này tên là 'username'
   formData.append("password", data.password);
 
   // return new Promise((resolve, reject) => {
@@ -61,6 +61,8 @@ export const registerUser = async (data: RegisterRequestDto): Promise<void> => {
     await apiClient.post("/register", {
       email: data.email,
       password: data.password,
+      username: data.username,
+      full_name: data.fullname,
     });
   } catch (error) {
     throw new Error("Đăng ký thất bại. Vui lòng thử lại.");

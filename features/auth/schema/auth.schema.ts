@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // 1. Login Schema
 export const LoginSchema = z.object({
-  email: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
+  username: z.string().min(1, "Vui lòng nhập tên đăng nhập"),
   password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
 });
 
@@ -12,6 +12,8 @@ export type LoginType = z.infer<typeof LoginSchema>;
 export const RegisterSchema = z
   .object({
     email: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
+    username: z.string().min(1, "Vui lòng nhập username"),
+    fullname: z.string().min(1, "Vui lòng nhập họ và tên"),
     password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
     confirmPassword: z.string(),
   })
