@@ -7,17 +7,23 @@ import { useAppStore } from "@/stores/app.store";
 import { useAuthStore } from "@/stores/auth.store";
 import MockBlurItem from "@/components/common/MockBlurItem";
 import AIAnalysisCard from "@/components/common/AIAnalysisCard";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { OrderForm } from "@/features/market/components/OrderForm";
 import { OrderBook } from "@/features/market/components/OrderBook";
+import { AuthRole } from "@/features/auth/types/auth.type";
 
 const INTERVALS = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
 export default function DashboardPage() {
   const { symbol } = useAppStore();
   const { user } = useAuthStore();
-  const isVip = user?.tier === "vip";
+  console.log("Current User in DashboardPage:", user);
+  const isVip = useMemo(() => {
+    return user?.tier === AuthRole.VIP;
+  }, [user]);
+
+  console.log("Is VIP User:", isVip);
   const [interval, setInterval] = useState("1m");
 
   return (

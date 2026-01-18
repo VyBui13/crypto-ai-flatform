@@ -1,6 +1,6 @@
 export enum AuthRole {
-  VIP = "vip",
-  NORMAL = "normal",
+  VIP = "VIP",
+  NORMAL = "NORMAL",
 }
 
 export interface User {
