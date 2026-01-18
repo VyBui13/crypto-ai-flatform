@@ -17,11 +17,11 @@ const INTERVALS = ["1m", "5m", "15m", "1h", "4h", "1d"];
 export default function DashboardPage() {
   const { symbol } = useAppStore();
   const { user } = useAuthStore();
-  const isVip = user?.role === "vip";
+  const isVip = user?.tier === "vip";
   const [interval, setInterval] = useState("1m");
 
   return (
-    <main className="h-full flex-1 flex flex-col min-w-0 bg-red-500">
+    <main className="h-full flex-1 flex flex-col min-w-0">
       <div className="flex-1 flex overflow-y-auto">
         <div className="flex-1 border-r border-[#2B2B43] relative flex flex-col">
           <div className="h-9 border-b border-[#2B2B43] flex items-center px-2 gap-1 bg-[#131722]">

@@ -7,7 +7,7 @@ export interface User {
   id: string;
   username: string;
   name: string;
-  role: AuthRole;
+  tier: AuthRole;
   avatar?: string;
 }
 

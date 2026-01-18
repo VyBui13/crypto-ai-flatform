@@ -7,12 +7,13 @@ import { SymbolSelector } from "@/features/market/components/SymbolSelector";
 import { Crown, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import { MarketTicker } from "@/features/market/components/MarketTicker";
+import { AuthRole } from "@/features/auth/types/auth.type";
 
 export const Header = () => {
   const { user, logout } = useAuthStore();
   const pathname = usePathname();
   const isDashboard = pathname === "/";
-  const isVip = user?.role === "vip";
+  const isVip = user?.tier === AuthRole.VIP;
 
   return (
     <header className="h-14 border-b border-[#2B2B43] flex items-center px-4 justify-between bg-[#131722] z-10 shrink-0">

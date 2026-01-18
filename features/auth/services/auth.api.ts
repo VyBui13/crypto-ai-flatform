@@ -71,8 +71,14 @@ export const registerUser = async (data: RegisterRequestDto): Promise<void> => {
 
 export const getUserProfile = async (): Promise<User> => {
   try {
-    const response = await apiClient.get("/users/me");
-    return response.data;
+    const response = await apiClient.get("/me");
+    return {
+      id: response.data.id,
+      username: response.data.username,
+      name: response.data.full_name,
+      tier: response.data.tier as AuthRole,
+      avatar: response.data.avatar_url || undefined,
+    };
   } catch (error) {
     throw new Error("Không thể lấy thông tin người dùng.");
   }
