@@ -102,3 +102,28 @@ export const getDepth = async (symbol: string): Promise<OrderBook> => {
     throw new Error("Lấy thông tin order book thất bại. Vui lòng thử lại.");
   }
 };
+
+export const chatWithMarketAI = async (
+  prompt: string,
+  symbol: string
+): Promise<string> => {
+  try {
+    // const response = await apiClient.post("/market/chat", {
+    //   prompt,
+    //   symbol: symbol.toUpperCase(),
+    // });
+
+    console.log("API gọi với prompt:", prompt, "và symbol:", symbol);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Giả lập delay
+
+    // Giả sử backend trả về { answer: "Nội dung phân tích..." }
+    return (
+      "Đây là câu trả lời giả lập từ AI cho prompt: " +
+      prompt +
+      " và symbol: " +
+      symbol
+    );
+  } catch (error) {
+    throw new Error("AI đang bận, vui lòng thử lại sau.");
+  }
+};
