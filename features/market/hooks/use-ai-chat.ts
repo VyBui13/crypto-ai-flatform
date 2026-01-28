@@ -35,7 +35,7 @@ export const useAIChat = (symbol: string) => {
 
       // 2. Gọi API thông qua Mutation
       chatMutation.mutate(
-        { prompt: content, symbol },
+        { prompt: content },
         {
           onSuccess: (data) => {
             // 3. Thêm tin nhắn phản hồi của AI
@@ -56,10 +56,10 @@ export const useAIChat = (symbol: string) => {
             setMessages((prev) => [...prev, errorMsg]);
             toast.error("Failed to get AI response");
           },
-        }
+        },
       );
     },
-    [symbol, chatMutation]
+    [symbol, chatMutation],
   );
 
   // Hàm Reset đoạn chat

@@ -4,7 +4,6 @@ import { chatWithMarketAI } from "./market.api";
 
 export const useChatMarketMutation = () => {
   return useMutation({
-    mutationFn: ({ prompt, symbol }: { prompt: string; symbol: string }) =>
-      chatWithMarketAI(prompt, symbol),
+    mutationFn: ({ prompt }: { prompt: string }) => chatWithMarketAI(prompt),
   });
 };

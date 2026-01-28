@@ -1,68 +1,45 @@
+import apiClient from "@/lib/api-client";
 import { MOCK_NEWS } from "../mocks/news.mock";
 import { GetNewsListRequestDto, GetNewsListResponseDto } from "./news.dto";
+import { MarketSentiment, NewsArticle } from "../types/news.type";
 
 export const getNews = async (
-  params: GetNewsListRequestDto
+  params: GetNewsListRequestDto,
 ): Promise<GetNewsListResponseDto> => {
-  const {
-    page = 1,
-    pageSize = 10,
-    isUnpaged = false,
-    filter,
-    sortBy = "publishedAt",
-    sortOrder = "desc",
-  } = params;
+  const queryParams = new URLSearchParams();
 
-  // 2. Giả lập delay mạng (0.8s)
-  await new Promise((resolve) => setTimeout(resolve, 4000));
+  // Mapping params từ UI sang chuẩn của Backend
+  if (params.page) queryParams.append("page", params.page.toString());
+  if (params.pageSize) queryParams.append("limit", params.pageSize.toString());
 
-  // Clone mảng để không ảnh hưởng dữ liệu gốc
-  let result = [...MOCK_NEWS];
-
-  // 3. Xử lý Filtering (Tìm kiếm)
-  if (filter?.search) {
-    const searchTerm = filter.search.toLowerCase();
-    result = result.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchTerm) ||
-        item.summary.toLowerCase().includes(searchTerm) ||
-        // Tìm trong cả mảng coin liên quan (ví dụ search "BTC" sẽ ra)
-        item.relatedCoins.some((coin) =>
-          coin.toLowerCase().includes(searchTerm)
-        )
-    );
+  // Nếu có search text
+  if (params.filter?.search) {
+    queryParams.append("q", params.filter.search); // Hoặc 'search' tùy backend
+    // Nếu backend bắt buộc dùng endpoint /news/search riêng thì check logic ở đây
   }
 
-  // 4. Xử lý Sorting (Sắp xếp)
-  result.sort((a, b) => {
-    let valA: any = a[sortBy];
-    let valB: any = b[sortBy];
+  // Gọi endpoint /news
+  const response = await apiClient.get(`/news?${queryParams.toString()}`);
+  return response.data;
+};
 
-    // Xử lý đặc biệt cho ngày tháng để so sánh chính xác
-    if (sortBy === "publishedAt") {
-      valA = new Date(a.publishedAt).getTime();
-      valB = new Date(b.publishedAt).getTime();
-    }
+export const getNewsBySymbol = async (
+  symbol: string,
+  page: number = 1,
+  limit: number = 10,
+): Promise<GetNewsListResponseDto> => {
+  const response = await apiClient.get(
+    `/news/by-symbol/${symbol}?page=${page}&limit=${limit}`,
+  );
+  return response.data;
+};
 
-    if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-    if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-    return 0;
-  });
+export const getNewsDetail = async (id: string): Promise<NewsArticle> => {
+  const response = await apiClient.get(`/news/${id}`);
+  return response.data;
+};
 
-  // 5. Xử lý Pagination (Phân trang)
-  const total = result.length;
-  let items = result;
-
-  if (!isUnpaged) {
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    items = result.slice(startIndex, endIndex);
-  }
-
-  return {
-    items,
-    total,
-    page: isUnpaged ? 1 : page,
-    pageSize: isUnpaged ? total : pageSize,
-  };
+export const getMarketSentiment = async (): Promise<MarketSentiment> => {
+  const response = await apiClient.get("/analysis/sentiment/market");
+  return response.data;
 };

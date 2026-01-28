@@ -1,21 +1,40 @@
 export enum SentimentType {
-  Positive = 'positive',
-  Neutral = 'neutral',
-  Negative = 'negative',
+  Positive = "positive",
+  Neutral = "neutral",
+  Negative = "negative",
+}
+
+export interface NewsAnalysis {
+  sentiment: "positive" | "negative" | "neutral" | string;
+  confidence: number;
+  trend: string;
+  reasoning: string;
 }
 
 export interface NewsArticle {
   id: string;
   title: string;
-  summary: string;
-  source: string;      // Ví dụ: CoinDesk, Bloomberg
-  url: string;         // Link gốc
-  imageUrl?: string;
-  publishedAt: string; // ISO Date
-  
-  // --- AI ENRICHED DATA (Phần này Crawler/AI sẽ điền vào) ---
-  relatedCoins: string[]; // ['BTC', 'ETH']
-  sentiment: SentimentType;
-  sentimentScore: number; // Từ -1 (cực xấu) đến 1 (cực tốt)
-  aiReasoning: string;    // Lý do tại sao AI đánh giá như vậy
+  source: string;
+  url: string;
+  content: string; // API trả về 'content', UI sẽ dùng làm summary
+  published_at: string; // Chú ý: snake_case
+
+  analysis: NewsAnalysis;
+
+  related_symbols?: string[];
+}
+
+export interface MarketSentiment {
+  period: string;
+  overall_sentiment: {
+    score: number;
+    label: string;
+    confidence: number;
+  };
+  breakdown: {
+    positive: number;
+    neutral: number;
+    negative: number;
+  };
+  analyzed_at: string;
 }

@@ -12,7 +12,7 @@ import {
 export const fetchHistoricalData = async (
   symbol: string,
   interval: string = "1m",
-  limit: number = 500
+  limit: number = 500,
 ): Promise<CandleData[]> => {
   try {
     const response = await apiClient.get("/market/klines", {
@@ -88,7 +88,7 @@ export const getDepth = async (symbol: string): Promise<OrderBook> => {
       "/market/depth/" + symbol.toUpperCase(),
       {
         params: { limit: 100 },
-      }
+      },
     );
     return {
       ...response.data,
@@ -103,26 +103,17 @@ export const getDepth = async (symbol: string): Promise<OrderBook> => {
   }
 };
 
-export const chatWithMarketAI = async (
-  prompt: string,
-  symbol: string
-): Promise<string> => {
+export const chatWithMarketAI = async (prompt: string): Promise<string> => {
   try {
     // const response = await apiClient.post("/market/chat", {
     //   prompt,
     //   symbol: symbol.toUpperCase(),
     // });
+    const response = await apiClient.post("/analysis/chat", {
+      message: prompt,
+    });
 
-    console.log("API gọi với prompt:", prompt, "và symbol:", symbol);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Giả lập delay
-
-    // Giả sử backend trả về { answer: "Nội dung phân tích..." }
-    return (
-      "Đây là câu trả lời giả lập từ AI cho prompt: " +
-      prompt +
-      " và symbol: " +
-      symbol
-    );
+    return response.data.reply;
   } catch (error) {
     throw new Error("AI đang bận, vui lòng thử lại sau.");
   }
