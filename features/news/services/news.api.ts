@@ -6,20 +6,30 @@ import { MarketSentiment, NewsArticle } from "../types/news.type";
 export const getNews = async (
   params: GetNewsListRequestDto,
 ): Promise<GetNewsListResponseDto> => {
+  const { page = 1, pageSize = 10, filter } = params;
+
+  // 1. Chuẩn bị Query Params chung
   const queryParams = new URLSearchParams();
+  queryParams.append("page", page.toString());
+  queryParams.append("limit", pageSize.toString());
 
-  // Mapping params từ UI sang chuẩn của Backend
-  if (params.page) queryParams.append("page", params.page.toString());
-  if (params.pageSize) queryParams.append("limit", params.pageSize.toString());
+  // Lấy giá trị filter
+  const symbol = filter?.category; // "BTC", "ETH"...
+  const search = filter?.search;
 
-  // Nếu có search text
-  if (params.filter?.search) {
-    queryParams.append("q", params.filter.search); // Hoặc 'search' tùy backend
-    // Nếu backend bắt buộc dùng endpoint /news/search riêng thì check logic ở đây
+  // 2. LOGIC CHỌN ENDPOINT
+  let url = "/news";
+
+  if (symbol && symbol !== "All" && symbol !== "all") {
+    url = `/news/by-symbol/${symbol}`;
   }
 
-  // Gọi endpoint /news
-  const response = await apiClient.get(`/news?${queryParams.toString()}`);
+  if (search) {
+    queryParams.append("q", search);
+  }
+
+  // Gọi API
+  const response = await apiClient.get(`${url}?${queryParams.toString()}`);
   return response.data;
 };
 
