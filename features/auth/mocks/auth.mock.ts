@@ -6,7 +6,7 @@ export const MOCK_USERS: Record<string, User> = {
     id: "u1",
     username: "vip_user",
     name: "Elon Musk",
-    role: AuthRole.VIP,
+    tier: AuthRole.VIP,
     avatar:
       "https://ui-avatars.com/api/?name=Elon+Musk&background=0D8ABC&color=fff",
   },
@@ -14,7 +14,7 @@ export const MOCK_USERS: Record<string, User> = {
     id: "u2",
     username: "normal_user",
     name: "Nguyen Van A",
-    role: AuthRole.NORMAL,
     avatar: "https://ui-avatars.com/api/?name=Van+A&background=random",
+    tier: AuthRole.NORMAL,
   },
 };
