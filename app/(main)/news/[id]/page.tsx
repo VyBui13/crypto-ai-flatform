@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 export default function NewsDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const id = decodeURIComponent(params.id as string);
 
   const { data: news, isLoading, isError } = useNewsDetail(id);
 

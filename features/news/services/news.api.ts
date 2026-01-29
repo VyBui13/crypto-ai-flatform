@@ -8,27 +8,25 @@ export const getNews = async (
 ): Promise<GetNewsListResponseDto> => {
   const { page = 1, pageSize = 10, filter } = params;
 
-  // 1. Chuẩn bị Query Params chung
   const queryParams = new URLSearchParams();
   queryParams.append("page", page.toString());
   queryParams.append("limit", pageSize.toString());
 
-  // Lấy giá trị filter
   const symbol = filter?.category; // "BTC", "ETH"...
   const search = filter?.search;
 
-  // 2. LOGIC CHỌN ENDPOINT
+  // luôn dùng 1 endpoint
   let url = "/news";
 
+  // truyền symbol qua query
   if (symbol && symbol !== "All" && symbol !== "all") {
-    url = `/news/by-symbol/${symbol}`;
+    queryParams.append("symbol", symbol);
   }
 
   if (search) {
     queryParams.append("q", search);
   }
 
-  // Gọi API
   const response = await apiClient.get(`${url}?${queryParams.toString()}`);
   return response.data;
 };

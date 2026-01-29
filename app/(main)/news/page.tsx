@@ -1,31 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react"; // Thêm useState
+import { useEffect } from "react";
 import { NewsCard } from "@/features/news/components/NewsCard";
 import {
   Loader2,
   Search,
   SlidersHorizontal,
   X,
-  TrendingUp,
+  FileX, // Import thêm icon cho trạng thái rỗng
+  RefreshCcw, // Icon nút reset
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteNewsQuery } from "@/features/news/services/news.query";
 import { useListFilter } from "@/hooks/use-list-filter";
-// 1. Import Query lấy Symbol
-import { useMarketSymbols } from "@/features/market/services/market.query";
 import { MarketSentimentWidget } from "@/features/news/components/MarketSentimentWidget";
 
-export default function NewsPage() {
-  // 2. Gọi hook lấy danh sách Symbol
-  const { data: symbolsData, isLoading: isLoadingSymbols } = useMarketSymbols();
+const TARGET_SYMBOLS = [
+  "BTCUSDT",
+  "ETHUSDT",
+  "BNBUSDT",
+  "XRPUSDT",
+  "SOLUSDT",
+  "ADAUSDT",
+  "DOGEUSDT",
+  "DOTUSDT",
+  "MATICUSDT",
+  "LTCUSDT",
+];
 
-  // Tạo danh sách filter: Luôn có "All", sau đó là 10 symbol đầu tiên (hoặc tất cả tùy UI)
-  const categoryFilters = [
-    "All",
-    ...(symbolsData?.slice(0, 15).map((s) => s.symbol) || []),
-  ];
+export default function NewsPage() {
+  const categoryFilters = ["All", ...TARGET_SYMBOLS];
 
   const {
     params: filterParams,
@@ -34,10 +39,7 @@ export default function NewsPage() {
   } = useListFilter(
     {
       pageSize: 10,
-      filter: {
-        category: "All", // category ở đây sẽ đóng vai trò là Symbol filter
-        search: "",
-      },
+      filter: { category: "All", search: "" },
     },
     { searchKey: "search", debounceTime: 500 },
   );
@@ -53,13 +55,18 @@ export default function NewsPage() {
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
-  const hasData = Boolean(data?.pages?.[0]?.items?.length);
+  // Logic kiểm tra xem có dữ liệu hay không
+  // (Lấy item của trang đầu tiên để check)
+  const hasData = (data?.pages?.[0]?.items?.length ?? 0) > 0;
+
+  // Xác định trạng thái Empty: Không loading + Không có data
+  const isEmpty = !isLoading && !hasData;
 
   return (
     <div className="min-h-screen bg-[#0E0E14] text-gray-300 font-sans">
       <main className="w-full p-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start h-full">
-          {/* SIDEBAR FILTER */}
+          {/* SIDEBAR FILTER (Giữ nguyên) */}
           <aside className="sticky top-4 col-span-1 space-y-6 h-full">
             <MarketSentimentWidget />
 
@@ -70,7 +77,6 @@ export default function NewsPage() {
               </div>
 
               <div className="space-y-5">
-                {/* Search Input giữ nguyên */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">
                     Keyword
@@ -98,45 +104,31 @@ export default function NewsPage() {
                   </div>
                 </div>
 
-                {/* Categories / Symbols Filter */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">
                     Related Coins
                   </label>
-
-                  {isLoadingSymbols ? (
-                    <div className="flex gap-2 flex-wrap">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div
-                          key={i}
-                          className="h-8 w-16 bg-[#2B2B43] rounded animate-pulse"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
-                      {categoryFilters.map((symbol) => {
-                        const isActive =
-                          filterParams.filter?.category === symbol;
-                        return (
-                          <button
-                            key={symbol}
-                            onClick={() =>
-                              handlers.handleFilterChange({ category: symbol })
-                            }
-                            className={cn(
-                              "px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
-                              isActive
-                                ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-900/20"
-                                : "bg-[#131722] border-[#2B2B43] text-gray-400 hover:border-gray-500 hover:text-gray-200",
-                            )}
-                          >
-                            {symbol}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
+                    {categoryFilters.map((symbol) => {
+                      const isActive = filterParams.filter?.category === symbol;
+                      return (
+                        <button
+                          key={symbol}
+                          onClick={() =>
+                            handlers.handleFilterChange({ category: symbol })
+                          }
+                          className={cn(
+                            "px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                            isActive
+                              ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-900/20"
+                              : "bg-[#131722] border-[#2B2B43] text-gray-400 hover:border-gray-500 hover:text-gray-200",
+                          )}
+                        >
+                          {symbol}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -153,9 +145,9 @@ export default function NewsPage() {
             </div>
           </aside>
 
-          {/* NEWS FEED LIST */}
+          {/* === NEWS FEED LIST === */}
           <div className="space-y-6 min-w-0 col-span-1 lg:col-span-2">
-            {/* ... Code hiển thị list news cũ giữ nguyên ... */}
+            {/* 1. Trạng thái Loading ban đầu */}
             {isLoading && (
               <div className="flex flex-col items-center justify-center py-20 bg-[#1E222D]/50 rounded-xl border border-dashed border-[#2B2B43]">
                 <Loader2
@@ -166,19 +158,46 @@ export default function NewsPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-5">
-              {data?.pages.map((group, i) => (
-                <div key={i} className="contents">
-                  {group.items.map((item) => (
-                    // Cần bọc Link vào NewsCard hoặc sửa NewsCard để navigate
-                    // Ở đây tôi giả định bạn sẽ click vào title để sang trang detail
-                    <NewsCard key={item.id} data={item} />
-                  ))}
+            {/* 2. Trạng thái KHÔNG CÓ DỮ LIỆU (Empty State) */}
+            {isEmpty && (
+              <div className="flex flex-col items-center justify-center py-20 bg-[#1E222D] rounded-xl border border-[#2B2B43] text-center px-4">
+                <div className="bg-[#2B2B43]/50 p-4 rounded-full mb-4">
+                  <FileX size={40} className="text-gray-500" />
                 </div>
-              ))}
-            </div>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  No news found
+                </h3>
+                <p className="text-gray-500 text-sm max-w-sm mb-6">
+                  We couldn't find any news matching "
+                  {searchTerm || filterParams.filter?.category}". Try adjusting
+                  your filters.
+                </p>
 
-            {/* Loading More Indicator */}
+                {/* Nút reset nhanh ở ngay empty state */}
+                <button
+                  onClick={() => handlers.resetFilters()}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <RefreshCcw size={16} />
+                  Clear Filters
+                </button>
+              </div>
+            )}
+
+            {/* 3. Hiển thị dữ liệu khi có data */}
+            {hasData && (
+              <div className="grid grid-cols-1 gap-5">
+                {data?.pages.map((group, i) => (
+                  <div key={i} className="contents">
+                    {group.items.map((item) => (
+                      <NewsCard key={item.id} data={item} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 4. Loading More Indicator */}
             <div ref={ref} className="py-4 flex justify-center h-10">
               {isFetchingNextPage && (
                 <Loader2 className="animate-spin text-blue-500" size={24} />

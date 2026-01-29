@@ -44,7 +44,7 @@ export const NewsCard = ({ data }: Props) => {
 
       {/* --- CLICKABLE AREA: Title & Summary -> Navigate to Internal Detail --- */}
       <Link
-        href={`/news/${data.id}`}
+        href={`/news/${encodeURIComponent(data.id)}`}
         className="block flex-1 group-hover:opacity-90 transition-opacity"
       >
         <h3 className="text-lg font-bold text-gray-100 mb-2 leading-snug group-hover:text-blue-400 transition-colors">

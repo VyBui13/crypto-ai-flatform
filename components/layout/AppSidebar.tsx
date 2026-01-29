@@ -57,7 +57,7 @@ export const AppSidebar = () => {
       </div>
 
       {/* --- DASHBOARD TOOLS (Chỉ hiện khi ở Dashboard) --- */}
-      {isDashboard && (
+      {/* {isDashboard && (
         <div className="flex flex-col gap-3 w-full px-2 pt-2 animate-in fade-in slide-in-from-left-2 duration-300">
           <div className="text-[9px] text-gray-600 font-bold text-center uppercase tracking-wider">
             Tools
@@ -81,7 +81,7 @@ export const AppSidebar = () => {
             title="Brush"
           />
         </div>
-      )}
+      )} */}
 
       {/* --- USER / FOOTER --- */}
       <div className="mt-auto flex flex-col gap-3 items-center w-full">
@@ -125,7 +125,7 @@ const NavItem = ({ href, icon, isActive, title }: any) => (
       "w-10 h-10 flex items-center justify-center rounded-xl transition-all",
       isActive
         ? "bg-blue-600/10 text-blue-500"
-        : "text-gray-400 hover:text-gray-200 hover:bg-[#2A2E39]"
+        : "text-gray-400 hover:text-gray-200 hover:bg-[#2A2E39]",
     )}
   >
     {icon}
@@ -140,7 +140,7 @@ const ToolButton = ({ icon, isActive, onClick, title }: any) => (
       "w-10 h-10 flex items-center justify-center rounded-lg transition-colors",
       isActive
         ? "bg-[#2A2E39] text-blue-400 border border-blue-500/30"
-        : "text-gray-500 hover:text-gray-300 hover:bg-[#2A2E39]"
+        : "text-gray-500 hover:text-gray-300 hover:bg-[#2A2E39]",
     )}
   >
     {icon}
