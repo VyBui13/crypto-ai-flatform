@@ -1,13 +1,13 @@
 export enum AuthRole {
-  VIP = "vip",
-  NORMAL = "normal",
+  VIP = "VIP",
+  NORMAL = "NORMAL",
 }
 
 export interface User {
   id: string;
   username: string;
   name: string;
-  role: AuthRole;
+  tier: AuthRole;
   avatar?: string;
 }
 

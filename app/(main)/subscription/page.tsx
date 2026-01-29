@@ -4,12 +4,14 @@ import { PricingCard } from "@/features/subscription/components/PricingCard";
 import { ShieldCheck } from "lucide-react";
 import { PricingCardSkeleton } from "@/features/subscription/components/PricingCardSkeleton";
 import { useSubscription } from "@/features/subscription/hooks/use-subcription";
+import { getTierRank } from "@/features/subscription/constants/subcription.constant";
 
 export default function SubscriptionPage() {
   const { user, subscription, isSubscriptionLoading, handlers } =
     useSubscription();
 
-  const currentPlanId = user?.role === "vip" ? "vip" : "basic";
+  // 1. Lấy Rank hiện tại của User (VD: FREE=0, VIP=1)
+  const currentUserRank = getTierRank(user?.tier);
 
   return (
     <div className="min-h-screen bg-[#0E0E14] text-gray-300 font-sans overflow-y-auto">
@@ -35,15 +37,26 @@ export default function SubscriptionPage() {
               <PricingCardSkeleton />
             </>
           ) : (
-            subscription?.map((plan) => (
-              <PricingCard
-                key={plan.id}
-                plan={{ ...plan, popular: plan.isPopular }}
-                isCurrentPlan={currentPlanId === plan.id}
-                onSubscribe={handlers.onSubscribe}
-                isLoading={false}
-              />
-            ))
+            subscription?.map((plan) => {
+              // 2. Tính Rank của Plan đang render
+              const planRank = getTierRank(plan.tier);
+
+              // 3. So sánh để xác định trạng thái
+              const isCurrentPlan = user?.tier === plan.tier;
+              // Nếu Rank user cao hơn Rank plan -> Đây là gói cấp thấp (Downgrade)
+              const isDowngrade = currentUserRank > planRank;
+
+              return (
+                <PricingCard
+                  key={plan.id}
+                  plan={plan}
+                  isCurrentPlan={isCurrentPlan}
+                  isDowngrade={isDowngrade} // Truyền xuống Card
+                  onSubscribe={handlers.onSubscribe}
+                  isLoading={false}
+                />
+              );
+            })
           )}
         </div>
 

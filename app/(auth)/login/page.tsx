@@ -7,9 +7,10 @@ import { Lock, User, Loader2, ArrowRight, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils"; // Hàm tiện ích class merge (nếu có)
 import { LoginSchema, LoginType } from "@/features/auth/schema/auth.schema";
 import { useLoginMutation } from "@/features/auth/services/auth.mutation";
+import { toast } from "sonner";
 
 export default function LoginPage() {
-  const { mutate, isPending, error, isError } = useLoginMutation();
+  const { mutateAsync, isPending, error, isError } = useLoginMutation();
 
   // 1. Setup Form Hook
   const {
@@ -25,8 +26,13 @@ export default function LoginPage() {
   });
 
   // 2. Submit Handler (Chỉ chạy khi validation pass)
-  const onSubmit = (data: LoginType) => {
-    mutate(data);
+  const onSubmit = async (data: LoginType) => {
+    try {
+      await mutateAsync(data);
+      toast.success("Login successful!");
+    } catch (err) {
+      console.log("Login error:", err);
+    }
   };
 
   return (
@@ -49,11 +55,11 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Username Field */}
+        {/* username Field */}
         <div className="space-y-1.5">
           <div className="flex justify-between">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Username
+              username
             </label>
             {errors.username && (
               <span className="text-xs text-red-400">

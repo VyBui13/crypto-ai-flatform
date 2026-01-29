@@ -3,6 +3,7 @@ import { NewsArticle } from "../types/news.type";
 
 export type NewsFilter = {
   search?: string;
+  category?: string; // symbol
 };
 
 export type NewsSortField = "publishedAt" | "sentimentScore";

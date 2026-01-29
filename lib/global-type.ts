@@ -2,7 +2,8 @@ export type PaginatedResponse<T> = {
   items: T[];
   total: number;
   page: number;
-  pageSize: number;
+  limit: number;
+  has_more: boolean;
 };
 
 export type PaginationRequest = {
@@ -22,5 +23,5 @@ export type SortRequest<TSortField extends string = string> = {
 
 export type BaseListRequest<
   TFilter = Record<string, any>,
-  TSortField extends string = string
+  TSortField extends string = string,
 > = PaginationRequest & FilterRequest<TFilter> & SortRequest<TSortField>;

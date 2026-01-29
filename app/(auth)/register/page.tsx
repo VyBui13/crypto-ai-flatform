@@ -3,16 +3,27 @@
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock, User, Loader2, AlertCircle, Type } from "lucide-react";
+// Thêm Mail và AtSign vào imports
+import {
+  Lock,
+  User,
+  Loader2,
+  AlertCircle,
+  Type,
+  Mail,
+  AtSign,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   RegisterSchema,
   RegisterType,
 } from "@/features/auth/schema/auth.schema";
 import { useRegisterMutation } from "@/features/auth/services/auth.mutation";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const { mutate, isPending, error, isError } = useRegisterMutation();
+  const { mutateAsync, isPending, error, isError } = useRegisterMutation();
 
   const {
     register,
@@ -21,20 +32,29 @@ export default function RegisterPage() {
   } = useForm<RegisterType>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      username: "",
-      name: "",
+      email: "",
       password: "",
       confirmPassword: "",
+      username: "",
+      fullname: "",
     },
   });
 
-  const onSubmit = (data: RegisterType) => {
-    // Zod đã đảm bảo password khớp nhau rồi, cứ thế gọi API thôi
-    mutate({
-      username: data.username,
-      password: data.password,
-      name: data.name,
-    });
+  const router = useRouter();
+
+  const onSubmit = async (data: RegisterType) => {
+    try {
+      await mutateAsync({
+        email: data.email,
+        password: data.password,
+        username: data.username,
+        fullname: data.fullname,
+      });
+      toast.success("Registration successful! Please log in.");
+      router.push("/login");
+    } catch (err) {
+      console.log("Registration error:", err);
+    }
   };
 
   return (
@@ -57,69 +77,95 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* Username */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between">
-              <label className="text-xs font-bold text-gray-500 uppercase">
-                Username
-              </label>
-            </div>
-            <div className="relative group">
-              <User
-                className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
-                size={16}
-              />
-              <input
-                {...register("username")}
-                type="text"
-                className={cn(
-                  "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
-                  errors.username
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-[#2B2B43] focus:border-blue-500"
-                )}
-                placeholder="user123"
-              />
-            </div>
-            {errors.username && (
-              <p className="text-[10px] text-red-400">
-                {errors.username.message}
-              </p>
-            )}
+        {/* --- FULL NAME --- */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-gray-500 uppercase">
+            Full Name
+          </label>
+          <div className="relative group">
+            <Type
+              className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
+              size={16}
+            />
+            <input
+              {...register("fullname")}
+              type="text"
+              className={cn(
+                "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
+                errors.fullname
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-[#2B2B43] focus:border-blue-500"
+              )}
+              placeholder="John Doe"
+            />
           </div>
-
-          {/* Full Name */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between">
-              <label className="text-xs font-bold text-gray-500 uppercase">
-                Full Name
-              </label>
-            </div>
-            <div className="relative group">
-              <Type
-                className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
-                size={16}
-              />
-              <input
-                {...register("name")}
-                type="text"
-                className={cn(
-                  "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
-                  errors.name
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-[#2B2B43] focus:border-blue-500"
-                )}
-                placeholder="John Doe"
-              />
-            </div>
-            {errors.name && (
-              <p className="text-[10px] text-red-400">{errors.name.message}</p>
-            )}
-          </div>
+          {errors.fullname && (
+            <p className="text-[10px] text-red-400">
+              {errors.fullname.message}
+            </p>
+          )}
         </div>
 
-        {/* Password */}
+        {/* --- USERNAME --- */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-gray-500 uppercase">
+            Username
+          </label>
+          <div className="relative group">
+            <User
+              className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
+              size={16}
+            />
+            <input
+              {...register("username")}
+              type="text"
+              className={cn(
+                "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
+                errors.username
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-[#2B2B43] focus:border-blue-500"
+              )}
+              placeholder="johndoe88"
+            />
+          </div>
+          {errors.username && (
+            <p className="text-[10px] text-red-400">
+              {errors.username.message}
+            </p>
+          )}
+        </div>
+
+        {/* --- EMAIL --- */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between">
+            <label className="text-xs font-bold text-gray-500 uppercase">
+              email
+            </label>
+          </div>
+          <div className="relative group">
+            {/* Đổi icon thành Mail cho đúng ngữ cảnh */}
+            <Mail
+              className="absolute left-3 top-3 text-gray-500 group-focus-within:text-blue-500"
+              size={16}
+            />
+            <input
+              {...register("email")}
+              type="text"
+              className={cn(
+                "w-full bg-[#131722] border rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 transition-colors placeholder-gray-700 text-white text-sm",
+                errors.email
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-[#2B2B43] focus:border-blue-500"
+              )}
+              placeholder="user@example.com"
+            />
+          </div>
+          {errors.email && (
+            <p className="text-[10px] text-red-400">{errors.email.message}</p>
+          )}
+        </div>
+
+        {/* --- PASSWORD --- */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-gray-500 uppercase">
             Password
@@ -148,7 +194,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {/* Confirm Password */}
+        {/* --- CONFIRM PASSWORD --- */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-gray-500 uppercase">
             Confirm Password

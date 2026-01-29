@@ -19,38 +19,31 @@ import { useCryptoSocket } from "../hooks/use-crypto-socket";
 
 interface TradingChartProps {
   symbol: string;
+  interval: string;
 }
 
-export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
+export const TradingChart: React.FC<TradingChartProps> = ({
+  symbol,
+  interval,
+}) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
 
-  const { data: candles, isLoading } = useHistoricalData(symbol);
+  const {
+    data: candles,
+    isLoading,
+    isFetching,
+  } = useHistoricalData(symbol, interval);
   const { activeTool } = useAppStore();
 
-  const lastCandle =
-    candles && candles.length > 0 ? candles[candles.length - 1] : undefined;
-
   useCryptoSocket({
-    symbol,
-    lastCandle: lastCandle as any,
-    enabled: !!candles && !isLoading, // Chỉ chạy khi đã load xong lịch sử
-    onUpdate: (updatedCandle) => {
+    symbol: symbol,
+    interval: interval,
+    onUpdate: (realtimeCandle) => {
       if (seriesRef.current) {
-        seriesRef.current.update(updatedCandle as any);
-      }
-
-      if (volumeSeriesRef.current) {
-        volumeSeriesRef.current.update({
-          time: updatedCandle.time,
-          value: updatedCandle.volume,
-          color:
-            updatedCandle.close >= updatedCandle.open
-              ? "rgba(38, 166, 154, 0.5)"
-              : "rgba(239, 83, 80, 0.5)",
-        } as any);
+        seriesRef.current.update(realtimeCandle);
       }
     },
   });
@@ -225,12 +218,12 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
   return (
     <div className="w-full h-full bg-[#131722] relative flex flex-col min-h-[400px]">
       {/* Symbol Label */}
-      <div className="absolute top-2 left-2 z-20 text-white font-bold bg-black/50 px-2 rounded pointer-events-none select-none">
+      {/* <div className="absolute top-2 left-2 z-1 text-white font-bold bg-black/50 px-2 rounded pointer-events-none select-none">
         {symbol} - D1
-      </div>
+      </div> */}
 
       {/* Loading Overlay */}
-      {isLoading && (
+      {(isLoading || isFetching) && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#131722] bg-opacity-80">
           <div className="text-white animate-pulse">Loading Chart Data...</div>
         </div>
