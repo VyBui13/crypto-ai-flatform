@@ -3,10 +3,8 @@
 import { useNewsDetail } from "@/features/news/services/news.query";
 import { useParams, useRouter } from "next/navigation";
 import {
-  ArrowLeft,
   Calendar,
   Loader2,
-  Share2,
   Tag,
   Bot,
   ExternalLink,
@@ -15,18 +13,19 @@ import {
   MessageSquareQuote,
 } from "lucide-react";
 import { SentimentBadge } from "@/features/news/components/SentimentBadge";
-import { cn } from "@/lib/utils";
 
 export default function NewsDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = decodeURIComponent(params.id as string);
+  const id = params.id as string;
+
+  // QUAN TRỌNG: Decode ID để tránh lỗi 404 từ Backend
 
   const { data: news, isLoading, isError } = useNewsDetail(id);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0E0E14]">
+      <div className="min-h-[calc(100vh-56px)] flex items-center justify-center bg-[#0E0E14]">
         <Loader2 className="animate-spin text-blue-500" size={32} />
       </div>
     );
@@ -34,7 +33,7 @@ export default function NewsDetailPage() {
 
   if (isError || !news) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0E0E14] text-gray-400 gap-4">
+      <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center bg-[#0E0E14] text-gray-400 gap-4">
         <AlertTriangle size={48} className="text-red-500" />
         <h2 className="text-xl font-bold">News not found</h2>
         <button
@@ -58,18 +57,10 @@ export default function NewsDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#0E0E14] text-gray-200 pb-20">
-      {/* Navbar giả lập hoặc Back Button */}
-      <div className="sticky top-0 z-10 bg-[#0E0E14]/80 backdrop-blur-md border-b border-[#2B2B43] px-4 py-3">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-        >
-          <ArrowLeft size={16} /> Back to Feed
-        </button>
-      </div>
+      {/* Đã xóa phần Header dính ở đây để tránh trùng lặp */}
 
-      <main className="max-w-3xl mx-auto px-4 mt-6">
-        {/* Header */}
+      <main className="max-w-3xl mx-auto px-4 mt-8">
+        {/* Header Title & Meta */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
             <span className="bg-blue-500/10 text-blue-400 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider border border-blue-500/20">
@@ -145,9 +136,8 @@ export default function NewsDetailPage() {
           </div>
         </div>
 
-        {/* Main Content */}
+        {/* Main Content Body */}
         <article className="prose prose-invert prose-blue max-w-none text-gray-300 leading-7">
-          {/* Nếu API trả về HTML thì dùng dangerouslySetInnerHTML, nếu text thì hiển thị trực tiếp */}
           {news.content.split("\n").map((paragraph, idx) => (
             <p key={idx} className="mb-4">
               {paragraph}

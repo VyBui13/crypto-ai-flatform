@@ -1,10 +1,9 @@
-// components/layout/Header.tsx
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SymbolSelector } from "@/features/market/components/SymbolSelector";
-import { Crown, LogOut } from "lucide-react";
+import { Crown, LogOut, ArrowLeft } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import { MarketTicker } from "@/features/market/components/MarketTicker";
 import { AuthRole } from "@/features/auth/types/auth.type";
@@ -12,32 +11,48 @@ import { AuthRole } from "@/features/auth/types/auth.type";
 export const Header = () => {
   const { user, logout } = useAuthStore();
   const pathname = usePathname();
+  const router = useRouter();
+
   const isDashboard = pathname === "/";
+  // Kiểm tra xem có đang ở trang chi tiết tin tức không (đường dẫn bắt đầu bằng /news/)
+  const isNewsDetail = pathname.startsWith("/news/");
   const isVip = user?.tier === AuthRole.VIP;
 
   return (
-    <header className="h-14 border-b border-[#2B2B43] flex items-center px-4 justify-between bg-[#131722] z-10 shrink-0">
-      {/* LEFT: Chỉ hiện Market Selector ở trang Dashboard hoặc hiện Logo/Title ở trang khác */}
+    <header className="h-14 border-b border-[#2B2B43] flex items-center px-4 justify-between bg-[#131722] z-10 shrink-0 sticky top-0">
+      {/* LEFT AREA: Điều hướng nội dung */}
       <div className="flex items-center gap-4">
         {isDashboard ? (
+          // TRƯỜNG HỢP 1: Trang chủ Dashboard
           <>
             <SymbolSelector />
             <MarketTicker />
-            {/* <div className="hidden md:flex gap-4 text-xs border-l border-[#2B2B43] pl-4">
-              <div className="flex flex-col">
-                <span className="text-gray-500">24h Change</span>
-                <span className="text-green-400 font-mono">+2.45%</span>
-              </div>
-            </div> */}
           </>
+        ) : isNewsDetail ? (
+          // TRƯỜNG HỢP 2: Trang News Detail (Hiện nút Back)
+          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2">
+            <button
+              onClick={() => router.back()}
+              className="p-1.5 hover:bg-[#2A2E39] rounded-md text-gray-400 hover:text-white transition-all group"
+            >
+              <ArrowLeft
+                size={20}
+                className="group-hover:-translate-x-1 transition-transform"
+              />
+            </button>
+            <h1 className="text-sm font-bold text-gray-200 uppercase tracking-wider">
+              News Detail
+            </h1>
+          </div>
         ) : (
+          // TRƯỜNG HỢP 3: Các trang khác (Login, Register, Settings...)
           <h1 className="text-sm font-bold text-gray-300 uppercase tracking-wider">
             {pathname.replace("/", "") || "Crypto AI"}
           </h1>
         )}
       </div>
 
-      {/* RIGHT: AUTH AREA (Dùng chung cho mọi trang) */}
+      {/* RIGHT AREA: User Auth (Giữ nguyên) */}
       <div className="flex items-center gap-3">
         {user ? (
           <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
