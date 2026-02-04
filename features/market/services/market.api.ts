@@ -109,7 +109,7 @@ export const chatWithMarketAI = async (prompt: string): Promise<string> => {
     //   prompt,
     //   symbol: symbol.toUpperCase(),
     // });
-    const response = await apiClient.post("/analysis/chat", {
+    const response = await apiClient.post("/analysis/chat/", {
       message: prompt,
     });
 
